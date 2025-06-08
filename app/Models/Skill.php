@@ -33,4 +33,9 @@ class Skill extends Model
     {
         return $this->user->pluck('username');  // Using the `projects` relationship to fetch all associated projects
     }
+
+    public function skillList()
+    {
+        return $this->pluck('skill_name');
+    }
 }

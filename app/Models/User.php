@@ -37,6 +37,7 @@ class User extends Authenticatable
         'full_name',
         'date_of_birth',
         'employee_code',
+        'date_hired',
     ];
 
     /**
@@ -61,6 +62,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'date_of_birth' => 'date',
+            'date_hired' => 'date',
         ];
     }
 
@@ -75,16 +77,15 @@ class User extends Authenticatable
             ->implode('');
     }
 
-    public function setUsername($username): bool
+    public function setUsername($username): void
     {
         $this->username = $username;
-        return $this->save();
+        // return $this->save();
     }
 
     public function setFullName(string $fullName): void
     {
         $this->full_name = $fullName;
-        $this->save();
     }
 
     public function getDOB(): string
@@ -95,19 +96,16 @@ class User extends Authenticatable
     public function setDOB(string $DOB): void
     {
         $this->date_of_birth = $DOB;
-        $this->save();
     }
 
     public function setEmail(string $email): void
     {
         $this->email = $email;
-        $this->save();
     }
 
     public function setPassword(string $password): void
     {
         $this->password = Hash::make($password);
-        $this->save();
     }
 
     public function setEmployeeCode(): void
@@ -118,7 +116,6 @@ class User extends Authenticatable
         } while (self::where('employee_code', $employeeCode)->exists());  // Ensure uniqueness
         
         $this->employee_code = $employeeCode;
-        $this->save();
     }
 
     public function setRole(string $role): void {
@@ -126,10 +123,14 @@ class User extends Authenticatable
         
         if (in_array($role, $validRoles)) {
             $this->role = $role;
-            $this->save();
         } else {
             throw new \InvalidArgumentException('Invalid role.');
         }
+    }
+
+    public function setDateHired()
+    {
+        $this->date_hired = now();
     }
 
     public function updatePassword($password): bool
@@ -141,11 +142,6 @@ class User extends Authenticatable
         
         $this->password = Hash::make($password);
         return $this->save();
-    }
-
-    public function getProjects()
-    {
-        return $this->projects->pluck('name');  // Using the `projects` relationship to fetch all associated projects
     }
 
     public function workOnProject($projectName)
@@ -184,5 +180,63 @@ class User extends Authenticatable
                 $this->skills()->attach($skill->id);
             }
         }
+    }
+
+    public function __toString(): string
+    {
+        return "User Details: " . PHP_EOL .
+            "Full Name: " . $this->full_name . PHP_EOL .
+            "Username: " . $this->username . PHP_EOL .
+            "Email: " . $this->email . PHP_EOL .
+            "Role: " . $this->role . PHP_EOL .
+            "Date of Birth: " . $this->date_of_birth . PHP_EOL .
+            "Employee Code: " . $this->employee_code . PHP_EOL .
+            "Password: " . $this->password . PHP_EOL; // Password may not be ideal to show directly
+    }
+
+    public function addSkill($skillId)
+    {
+        // Attach the skill to the user
+        return $this->skills()->attach($skillId);
+    }
+
+    public function addProject($projectId)
+    {
+        // Attach the skill to the user
+        return $this->projects()->attach($projectId);
+    }
+
+    public function getProjectsByName()
+    {
+        return $this->projects->pluck('name');  // Using the `projects` relationship to fetch all associated projects
+    }
+
+    public function getProjectsById()
+    {
+        return $this->projects->pluck('id');  // Using the `projects` relationship to fetch all associated projects
+    }
+
+    public function getSkillsByName()
+    {
+        return $this->skills->pluck('name');  // Using the `skills` relationship to fetch all associated projects
+    }
+
+    public function getSkillsById()
+    {
+        return $this->skills->pluck('id');  // Using the `skills` relationship to fetch all associated projects
+    }
+
+    public function getAdditionalSkills()
+    {
+        $userSkills = $this->getSkillsById();
+        
+        return Skill::whereNotIn('id', $userSkills)->pluck('name');
+    }
+
+    public function getAdditionalProjects()
+    {
+        $projectSkills = $this->getProjectsById();
+        
+        return Project::whereNotIn('id', $projectSkills)->pluck('name');
     }
 }

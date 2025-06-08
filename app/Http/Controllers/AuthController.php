@@ -10,11 +10,17 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        return view('auth.login');  // Show the login form
+        dd('At show login');
+    //     if (Auth::check()) {
+    //     return redirect()->route('dashboard');
+    // }
+
+        return view('livewire.pages.auth.login');  // Show the login form
     }
 
     public function login(Request $request)
     {
+        // dd('At login');
         // Validate the input
         $request->validate([
             'username' => 'required|string|max:255',
@@ -27,13 +33,16 @@ class AuthController extends Controller
             // Redirect based on user role
             switch ($user->role) {
                 case 'admin':
-                    return redirect()->route('admin.dashboard')->with('success', 'Welcome, Admin!');
+                    // return redirect()->route('admin.dashboard')->with('success', 'Welcome, Admin!');
+                    echo("Admin Hello");
                 case 'manager':
-                    return redirect()->route('manager.dashboard')->with('success', 'Welcome, Manager!');
+                    // return redirect()->route('manager.dashboard')->with('success', 'Welcome, Manager!');
+                    echo("Manager Hello");
                 case 'staff':
-                    return redirect()->route('staff.dashboard')->with('success', 'Welcome, Staff!');
+                    // return redirect()->route('staff.dashboard')->with('success', 'Welcome, Staff!');
+                    echo("Staff Hello");
                 default:
-                    return redirect('/')->with('error', 'Access Denied');
+                    return redirect('/')->with('error', 'Invalid role');
             }
         }
         // If login attempt fails
@@ -46,4 +55,3 @@ class AuthController extends Controller
         return redirect('/')->with('success', 'Logged out successfully.');
     }
 }
-

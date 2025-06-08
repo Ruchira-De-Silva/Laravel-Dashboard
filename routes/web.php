@@ -19,11 +19,19 @@ Route::view('profile', 'profile')
 // Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
 
 Route::get('/login', [AuthController::class,
-'showLoginForm']);
+'showLoginForm'])->name('login');
 
-Route::middleware(['auth', 'role:admin'])
+Route::post('login', [AuthController::class,
+'login'])->name('login.submit');
+
+Route::post('logout', [AuthController::class,
+'logout'])->name('logout');
+
+Route::middleware(['auth'/*, 'role:admin'*/])
 ->get('/admin/register', [RegisterController::class,
 'showRegisterForm']);
 
+Route::post('register', [RegisterController::class,
+'register'])->name('register.submit');
 
 require __DIR__.'/auth.php';

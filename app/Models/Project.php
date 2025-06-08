@@ -76,6 +76,6 @@ class Project extends Model
 
     public function getUsers()
     {
-        return $this->user->pluck('username');  // Using the `projects` relationship to fetch all associated projects
+        return $this->users()->pluck('username');  // Using the `projects` relationship to fetch all associated projects
     }
 }

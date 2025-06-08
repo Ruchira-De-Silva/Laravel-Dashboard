@@ -39,9 +39,9 @@ class RegisterController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:admin,manager,staff',  // Ensure role is valid
             'date_of_birth' => 'required|date',
-            'employee_code' => 'required|string|unique:users,employee_code',
         ]);
 
+        // dd("after validation");
         // Create the user
         $user = new User();
         $user->setFullName($request->full_name);
@@ -49,9 +49,14 @@ class RegisterController extends Controller
         $user->setEmail($request->email);
         $user->setPassword($request->password); // Hash the password
         $user->setRole($request->role);
-        $user->DOB($request->date_of_birth);
+        $user->setDOB($request->date_of_birth);
+        $user->setDateHired();
         $user->setEmployeeCode();
 
-        return redirect()->route('admin.dashboard')->with('success', 'User registered successfully.');
+        $user->save();
+        // dd($user->__toString());
+
+        session()->flash('success', 'User registered successfully.');
+        return redirect()->route('registration');
     }
 }
